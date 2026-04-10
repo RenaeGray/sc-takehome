@@ -1,6 +1,7 @@
 import plotly.express as px
 import streamlit as st
 from datetime import date
+from src.transform import download_parquet
 from src.queries import (db,
                         delay_trend,
                         delay_by_carrier,
@@ -11,6 +12,8 @@ from src.queries import (db,
 
 st.set_page_config(layout="wide")
 st.title("✈️ Flight Delay Dashboard")
+
+download_parquet()
 
 DATE_MIN = date(2018, 1, 1)
 DATE_MAX = date(2025, 1, 31)
@@ -104,11 +107,11 @@ with right.container(border=True):
 # Chart 2: Ranked airlines 
 fig2 = px.bar(
     carrier_df, x="Reporting_Airline", y="delay_rate",
-    title=f"2. Which airlines are worst? ({date_label})"
+    title=f"2. Which airlines have the worst delays? ({date_label})"
 )
-render_chart(fig2, "Delay rate per airline. Rate is used so a carrier with 10x more flights can still be compare against a smaller carrier.")
+render_chart(fig2, "Delay rate per airline. Rate is used so an airline with 10x more flights can still be compared against a smaller airline.")
 
-# Chart 3: Which airlines are bad - and why?
+# Chart 3: Which airlines are the worst & why?
 cause_melted = cause_car_df.melt(
     id_vars="Reporting_Airline",
     value_vars=["airline_issues_rate", "weather_rate", "air_traffic_rate", "security_rate"],
@@ -123,9 +126,9 @@ cause_melted = cause_car_df.melt(
 fig4 = px.bar(
     cause_melted, x="Reporting_Airline", y="rate", color="cause",
     barmode="stack",
-    title=f"3. Which airlines are bad — and why? ({date_label})"
+    title=f"3. Which airlines have the most delays - and what caused those delays? ({date_label})"
 )
-render_chart(fig4, "Each bar shows a carrier's total delay rate, split by what caused those delays.")
+render_chart(fig4, "Each bar shows an airline's total delay rate, split by what caused those delays.")
 
 # Chart 3: Why are flights delayed?
 causes_melted = causes_row.melt(
@@ -140,15 +143,15 @@ causes_melted = causes_row.melt(
 causes_melted["share"] = causes_melted["delay_minutes"] / causes_melted["delay_minutes"].sum()
 fig3 = px.bar(
     causes_melted, x="cause", y="share",
-    title=f"4. Why are flights delayed? ({date_label})"
+    title=f"4. What causes the most delays? ({date_label})"
 )
-render_chart(fig3, "Share of total delay minutes by cause across all carriers in the selected period.")
+render_chart(fig3, "Share of total delay minutes by cause across all airlines in the selected period.")
 
 # Chart 5: Worst Airport/route comparison 
 dim_col = "route" if compare_by == "Route" else "airport"
 fig5 = px.bar(
     dimension_df, x=dim_col, y="delay_rate",
-    title=f"5. Are some {compare_by.lower()}s worse? Top 20 ({date_label})"
+    title=f"5. Which {compare_by.lower()}s  have the worst delays? Top 20 ({date_label})"
 )
 render_chart(fig5,
     f"Top 20 {compare_by.lower()}s by delay rate. "
@@ -160,7 +163,7 @@ render_chart(fig5,
 # Chart 6: Best airports/routes comparision
 fig6 = px.bar(
     dimension_best_df, x=dim_col, y="delay_rate",
-    title=f"6. Which {compare_by.lower()}s are most reliable? Top 20 ({date_label})"
+    title=f"6. Which {compare_by.lower()}s are the most reliable? Top 20 ({date_label})"
 )
 render_chart(fig6,
     f"Top 20 most on-time {compare_by.lower()}s by delay rate. "

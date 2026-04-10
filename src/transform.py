@@ -1,8 +1,19 @@
 import duckdb
+import gdown
 import os
 import shutil
 
 PARQUET_PATH = "data/processed/flights.parquet"
+PARQUET_GDRIVE_URL = "https://drive.google.com/file/d/1Ix1akz6UjfTHkfY14r-dlRhN7JOdMWM3/view?usp=sharing" 
+
+def download_parquet():
+    if os.path.exists(PARQUET_PATH):
+        return
+    if not PARQUET_GDRIVE_URL:
+        raise RuntimeError("PARQUET_GDRIVE_URL is not set in transform.py")
+    os.makedirs(os.path.dirname(PARQUET_PATH), exist_ok=True)
+    print("Downloading parquet from Google Drive...")
+    gdown.download(PARQUET_GDRIVE_URL, PARQUET_PATH, fuzzy=True)
 
 def transform_to_parquet():
     if os.path.exists(PARQUET_PATH):
