@@ -1,0 +1,6 @@
+duckdb>=1.5.1
+gdown>=5.2.0
+plotly>=6.6.0
+pyarrow>=19.0.0
+requests>=2.33.1
+streamlit>=1.56.0
