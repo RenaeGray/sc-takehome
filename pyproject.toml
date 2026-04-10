@@ -1,0 +1,16 @@
+[project]
+name = "sc-takehome"
+version = "0.1.0"
+description = "DE takehome exercise"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=1.5.1",
+    "plotly>=6.6.0",
+    "pyarrow>=19.0.0",
+    "requests>=2.33.1",
+    "streamlit>=1.56.0",
+]
+
+[tool.uv]
+package = true
